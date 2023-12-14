@@ -9,6 +9,9 @@ From the original author:
   - The name(s) of the author(s) that contributed to the development of the driver, will always appear on the code and/or documentation, and that includes me :-)
 
 VGATV Version 2001.0604
+
 By Paulo S‚rgio Coelho, 1997-2001
+
 TSR code by Santiago Mantinan, 1999
+
 Other credits on the source code, where appropriate.
