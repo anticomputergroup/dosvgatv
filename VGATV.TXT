@@ -1,0 +1,326 @@
+VGATV Version 2001.0604
+By Paulo S‚rgio Coelho, 1997-2001
+TSR code by Santiago Mantinan, 1999
+Other credits on the source code, where appropriate.
+
+Last updated: June 4th, 2001
+
+Contact information at the end of this document.
+
+--- Impatient ? -----------------
+
+  Ok, just enter this: VGATV /? for a short help on which parameters suit you
+best.  Entering VGATV, loads the driver with PAL timings, and will try to
+determine which VGA chipset is present, otherwise will just support plain VGA.
+Supports VESA at all times, though might work better if the chipset is
+recognized earlier. If your chipset is misidentified, you can (and should)
+force VGATV to use one of the supported by issuing the correct switch below.
+Note that PCI/AGP cards do not have this problem.
+
+  Parameters can be entered in any order, and are case insensitive.
+
+  /? - Prints a short help text, so you can get a general idea on how to use
+       the program.
+
+  /IBM - makes the program ignore any chipset on the system, which might be
+         useful if the program improperly detects your VGA card.
+  /OAK - to support the Oak series VGA boards. Note that the Oak 037 chipset
+         doesn't have interlace support. Also, the Oak 077-087 chipsets don't
+         allow full-screen low-resolution modes (320x200 at 4 or 16 colors) so
+         the normal, standard setting, must be used. Other Oaks do, however.
+  /S3  - supports the S3 range of chipsets.
+  /CIRRUS - For the GD54xx range of chipsets. Also Acumos AVGA1 or 2.
+  /TRIDENT - Trident VGA cards, from 8900 to 9440 so far.
+  /REALTEK - Realtek range of cards. You must use this if you have a RTG3103,
+             because VGATV can't recognize this chipset.
+  /UMC - selects UMC 85c4x8 chipsets.
+  /WD  - Western Digital Paradise chipsets.
+  /TSENG - Tseng Labs cards.
+
+  /NTSC - chooses NTSC timings, instead of PAL timings.
+  /PAL  - Just does the opposite. This is the default setting.
+
+  /ISP - Invert Synchronization Polarity, for some hardware that inverts the
+         sync polarity. Shouldn't normally be needed.
+
+  /OE - Odd/Even mode. Some RGB converters seem to need that the screen has an
+        even number of vertical retrace lines, otherwise you'll get a nice
+        black and white screen. No colors. This little parameter is used to
+        fine tune your badly-behaved board so that it outputs the proper number
+        of lines. Yeah, because this shouldn't be needed!
+
+  /X:<n>
+  /Y:<n> - Used to center the video output on the TV. Instead of constantly
+           using the cursor keys, this way you can predefine the startup
+           values.
+
+  /NOINTR - If you find interlace produces too much flickering, and can get
+            away with half the vertical resolution, use this to disable it.
+
+  /S:<n> - With the new PCI/AGP VGA card detection it becomes possible to
+           exist 2 or more video cards on the same system. While VGATV will
+           only use the card defined as primary card on BIOS, VGATV might not
+           detect that video card because it scans the PCI/AGP bus first and
+           will detect the first card that it supports, which might not be the
+           primary one. This switch will make VGATV ignore (skip) <n> video
+           cards before using the next detected one. This only works for PCI/
+           AGP cards, on which bus can reside more than one VGA card.
+
+  /M - Starts in VGA monitor mode, instead of TV mode. Switch with Ctrl+Alt+S.
+
+  /U - Unloads the program from memory. Won't do it when some other TSR was
+       loaded after ours.
+
+--- The program -----------------
+
+  This program allows you to use your TV as a monitor, given that you use the
+proper hardware to connect your VGA to the output equipment.
+
+  The driver is a TSR (Terminate and Stay Resident) which will try to make
+sure your VGA card is, at all times, properly programmed for TV timings, which
+are quite different from VGA standards:
+
+  - Standard VGA timings are normally 31.469KHz horizontal frequency, and
+    70.08Hz vertical frequency. Non-interlaced.
+
+  - PAL and NTSC are interlaced. PAL (Phase Alternating Line) has a horizontal
+    frequency of 15.625Khz and 50Hz vertical frequency. NTSC (National
+    Television Standards Committee) has 15.750Khz and 60Hz respectively.
+
+  There will be programs which won't work well, others won't work at all,
+because they either use an unsupported video mode, or program the video card
+directly, after they've set the mode. Plus, some chipests aren't fully or at
+all supported.
+
+  Supported resolutions so far: due to the way the program works, resolutions
+"per si" are not supported, but rather widths, heights and combinations among
+them. This makes the driver more flexible among different SVGA chipsets.
+  Because of the number of values supported, I won't discriminate them here.
+You can find however, a compatibility table on the web site. This table is by
+no means complete. More than likely the video cards featured could support
+more video modes under VGATV, not to mention other chipsets (albeit with no
+interlace support).
+
+  Note that since NTSC has less vertical resolution than PAL, modes above 480
+lines appear more overscanned than PAL.
+
+  There is no limit on the number of colours. However, due to the way some of
+the higher colour mode modes are programmed, some of them may not be usable
+under certain cards. For example, while I don't support 640x480x16.7M colors
+in the Oak chipset, that mode is supported on the Cirrus Logic chipset, among
+others.
+
+--- The keys --------------------
+
+  Ctrl+Alt+R resets the current video mode, so that if some crappy program
+messed your screen, you can restore it back to normal. Also works when in VGA
+mode. Note that this might not do any good under certain circumstances.
+
+  Ctrl+Alt+S swaps between VGA and TV modes. Not working perfectly and can
+hang your machine...
+
+  Ctrl+Alt+arrows shift and pan the screen around your telly. I've gone to
+great lenghts to make sure you could shift the screen quite heavily. It won't
+work fine at the extremes on all boards, but should work ok if you don't abuse
+it, and use it just for what it's for: making the screen appear centered on
+the TV or monitor.
+  On the other hand, I haven't taken much time to put the vertical control
+working fine. It works for small adjustments only.
+
+--- The requirements ------------
+
+  For this to work, you need the following:
+
+  a) a IBM PC or compatible computer system (clone for short :-). And yes,
+     your 4.77Mhz IBM PC will do. The PCI/AGP card detection uses 32-bit code
+     which won't run on 286 or less CPUs. Behaviour is undefined if for some
+     reason VGATV thinks you have a PCI bus on your system;
+
+  b) a VGA card. 3D cards only (like the first 3DFx's Voodoos) aren't
+     supported;
+
+  c) some memory to load this driver; if you can run DOS, you can run this.
+     To save memory, you can try loading it high. Like :
+
+     LH VGATV, in AUTOEXEC.BAT
+
+  d) an output device like a TV or 15Khz monitor.
+
+  Optionally, you can also have this:
+
+  e) some hardware for the video connection, for which you can find many
+     details and options on the web site.
+
+  f) a VCR for saving those presentations;
+
+  g) a sound board connected to your Hi-Fi system, with volume turned fully
+     clockwise, or at the point where neighbours *just* start complaining :-)
+
+  h) some application software (a game *IS* an application!).
+
+--- The limitations -------------
+
+  Humm, right. As stated above, besides the ocasional badly-behaved program,
+this driver comes with guaranteed limitations:
+
+  With PAL timings, only resolutions up to 800x600 can be fully viewed. With
+NTSC this figure goes down to 640x480, thanks to the lower resolution of this
+TV standard (525 horizontal lines, as opposed to PAL's 625). 800x600 appears
+as an overscanned mode, both in PAL and NTSC. PAL sees much less screen crop
+than NTSC, though. This is the preferred video mode for video recording.
+
+  Since there are obvious limitations on the number of lines, modes that have
+more than 525/625 lines, use the trick described below, in which the resolution
+is actually halved, though for most purposes, it doesn't show much. Only if
+you're trying to display text, you might run into trouble if the pitch is too
+small. However, for photographs or most drawings, there isn't a noticeable
+decrease in resolution.
+
+  Maximum resolution is 1600x1200. Nothing above is supported.
+  Minimum is 320x200. Actually, 320x175, if you can produce such a beast...
+  Resolution is halved in modes above 800x600, in both PAL and NTSC, but NTSC
+has much more overscan than PAL. Resolution is also halved in unsupported
+chipsets at 640x480 and above resolutions, if they aren't interlaced
+originally. This will find a limit very fast on chipsets featuring few bits of
+a register that goes by the name of Offset, on the CRTC.
+
+  Because standard VGA has no support for interlaced screen modes, a trick has
+to be employed to get the visible area of a video mode in the screen at all
+times, including modes with more than 480/600 lines.
+  It works by skiping every other line, namely even numbered lines (2,4,6,...).
+
+  This, however, has some disadvantages:
+  - normal text in those modes (which by themselves are high, like 1024x768) is
+    very hard to read, if not impossible;
+  - 256 color modes are affected. The result is a kind of solarizing effect on
+    the palette, making some images look a bit 16 colourish... Note that this
+    depends on the picture being displayed. Some programs or pictures don't
+    seem to be affected.
+
+  Fortunately, your VGA card's chipset may be supported by the program, thus
+allowing you to have an interlaced screen, no missing lines, and a perfect
+colour display (up to 480/600 lines per image, remember). Yeah, pigs can fly,
+too! :-)
+
+  The program is clever enough to, under certain conditions, support
+non-standard VGA modes while not supporting any specific chipset. This depends
+on the fact that some modes on some boards, specifically turn on interlacing
+so that the driver doesn't have to do it, and you can see a 1280x1024 mode
+even if the driver doesn't actually support your board!
+  If the mode has more than 600 lines, and doesn't turn on interlacing, only
+part of the screen will be shown, full-screen, but stretched downwards. I've
+added code to end this problem, but it might occur sometimes still.
+  Also, depending on how the program sets the dot-clock, some modes might not
+sync, while others, even higher resolution ones, might do. 800x600 is a
+general culprit...
+
+  Note that screen modes which have less than 300 lines, don't need
+interlacing, thus are fully viewable, with no lines missing. This includes all
+low resolution modes, such as mode 13h (320x200 with 256 colours).
+
+  Text modes are limited to 32 lines, but there is no limitation on width.
+Currently, modes 40x25, 80x25 and 132x25 are supported since I know of none
+other. If they appear, there might be a chance that the program does recognize
+them. Modes with more than 25 (or 30, if your card has 30-line modes) won't
+show more than 32 lines at one time. The remaining lines aren't shown.
+
+  200-line modes are not interlaced. I tried to, but it seemed impossible, at
+least on the Oak 087 chipset. Anyway, as it is, the screen is much stabler,
+since there is no interlacing.
+
+--- The contacts ----------------
+
+  If you want to share some comments on this, suggestions, criticism, chipset
+  programming details on unsupported cards, post-cards, money, etc, just write
+  to:
+
+  e-mail : psergio@radiolink.net
+
+  or,
+
+  snail-mail : Paulo S‚rgio Coelho
+               Praceta do Miradouro, 9, R/C Frente-Esq.
+               2720-375 Alfragide
+               Portugal
+
+  Please note that mail-bombs will be returned to sender. No kidding.
+
+  You can also access my web page at:
+
+  http://www.radiolink.net/psergio, or
+
+  http://www.geocities.com/SiliconValley/Horizon/7694
+
+  for the latest version, news, developer information and other projects of
+  mine.
+
+  There is also a mailing list setup on E-Groups (former OneList), for which
+you can register directly from the web page or go to www.egroups.com and
+search for the vgatv mailing list.
+
+  The first address is a redirector and should always be used, unless you run
+into problems and might try the second one. If the web page site changes from
+GeoCities, the first address should take you to the right place then.
+
+--- The legal juice -------------
+
+  Ok, so you find this little piece of software useful.
+
+  Very well, you can use it, at your OWN risk, meaning if you blow up the TV,
+the VCR or your room, I really don't give a damn, it was YOUR fault, NOT mine.
+Same thing for the hardware circuits. Warranty is void before you thought of
+downloading this file. So there.
+
+  Also, this software may be copied, used and abused, but nowhere modified so
+that my work and others that went into it, are not credited in any way or are
+even deliberately hidden from others.
+  You can find all sources available to download and you can contribute to the
+project in any way you see fit, or just use the code for your own projects.
+But remember to give credited where due.
+
+  Additionally, you can consider this work, one of the following:
+
+  - freeware, meaning you can use it 'till it wears off;
+  - shareware, meaning if you send me money, I'll appreciate it, and you'll
+    win a line in this DOC; or,
+  - cardware, in which you send me one (or more!) of those fancy postcards
+    showing off the views on your local town. I really prefer this one better.
+
+  Ok, I think this one's done. Next!
+
+--- The contributions -----------
+
+  This section grew quite a bit, so please consult the web site for more
+information on who contributed what.
+
+--- The history log -------------
+
+  This section is highly obsolete. For the latest driver developments, please
+go to the Download section on the web site. What follows has only historic
+meaning.
+
+  Version 1.0  - Well, for a 2 day job, it wasn't that bad. Supported all
+  Jan 17, 1997   standard VGA modes and fixed some problems occuring in a
+                 previously used driver. However, it had some problem with
+                 another driver, which I didn't bother to identify, and also
+                 had a color problem in a Trident card, in mode 13h (320x200,
+                 256 colors).
+
+  Version 2àx - Good alpha versions. 2à3 was the last in the line.
+  Jan-Mar, 1997
+
+  Versions 98.xxx - and above. See the web page for details.
+
+  Version 98.288 - /OE switch added.
+  Oct 15, 1998     Documentation updated and revised after a long time.
+
+  Version 98.298 - /OE switch wasn't being detected if it was the only one
+  Oct 25, 1998     being specified. Yeah, a bug.
+
+  Version 99.047 - /U switch added. The program has been converted to ASM,
+  Feb 16, 1999     which means less RAM used when loaded. Also the uninstall
+                   process is different. Minor bugs corrected.
+
+  Version 99.055 - Mode swapping between VGA and TV works now. Text still not
+  Feb 24, 1999     recovering well. Less memory used when resident.
+
